@@ -1,0 +1,8 @@
+target/*
+DS_STORE
+*DS_STORE
+*Icon*
+.idea/*
+.idea/
+*.class
+
