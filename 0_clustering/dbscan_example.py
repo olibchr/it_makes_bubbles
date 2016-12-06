@@ -47,13 +47,15 @@ for k, col in zip(unique_labels, colors):
 
     class_member_mask = (labels == k)
 
+
     xy = X[class_member_mask & core_samples_mask]
     plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=col,
              markeredgecolor='k', markersize=14)
+    print xy
 
-    xy = X[class_member_mask & ~core_samples_mask]
-    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=col,
-             markeredgecolor='k', markersize=6)
+    # xy = X[class_member_mask & ~core_samples_mask]
+    #plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=col,
+    #         markeredgecolor='k', markersize=6)
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
 plt.show()
