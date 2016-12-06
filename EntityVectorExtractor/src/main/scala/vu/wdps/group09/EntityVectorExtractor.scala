@@ -17,14 +17,15 @@ import vu.wdps.group09.model.FreeBaseEntity
 
 import scala.collection.JavaConversions._
 
-class EntityVectorExtractor {
+object EntityVectorExtractor {
   object LogHolder extends Serializable {
     @transient lazy val log: Logger = LogManager.getRootLogger
   }
 
   def main(args: Array[String]) = {
     val inputPath = args(0)
-    val outputPath = args(0)
+    val outputPath = args(1)
+    var partitions = Integer.parseInt(args(2))
 
     val logger = LogManager.getRootLogger
     logger.setLevel(Level.INFO)
@@ -35,31 +36,18 @@ class EntityVectorExtractor {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     val sc = new SparkContext(conf)
 
-    // Read from input
-    val input: RDD[(LongWritable, WarcRecord)] = sc.newAPIHadoopFile(inputPath, classOf[WarcInputFormat], classOf[LongWritable], classOf[WarcRecord])
+    // Read text
+    val input = sc.textFile(inputPath, partitions)
 
-    // Get all entities grouped by the URL where they were found
-    val entitiesByURL: RDD[(String, List[FreeBaseEntity])] = input.map(_._2)
-      // Only HTTP responses
-      .filter(wr => wr.header.contentTypeStr == "application/http; msgtype=response")
-      // Only HTML content
-      .filter(wr => Option(wr.getHttpHeader.contentType).getOrElse("").contains("text/html"))
-      .filter(_.hasPayload)
-      // Get payload
-      .map(wr => (wr.header.getHeader("WARC-Target-URI").value, IOUtils.toString(wr.getPayload.getInputStreamComplete)))
-      // Get HTML
-      .flatMap {
-        case (url, payload) => {
-          // Apparently it can still happen that we don't get actual XML/HTML as output, so catch exception
-          try {
-            Option(url, payload.substring(payload.indexOf('<')))
-          } catch {
-            case e: Exception => None
-          }
-        }
-      }
-      // Get relevant text from HTML
-      .mapValues(CommonExtractors.ARTICLE_EXTRACTOR.getText)
+    val entitiesByURL: RDD[(String, List[FreeBaseEntity])] = input
+      // Parse TSV line
+      .map(_.split("\t"))
+      .map(tokens => {
+        if (tokens.length == 1)
+          (tokens(0), "")
+        else
+          (tokens(0), tokens(1))
+      })
       // Extract named entities from text
       .mapPartitions(iter => {
         // Load classifier

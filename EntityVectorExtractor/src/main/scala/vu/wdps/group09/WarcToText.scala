@@ -17,10 +17,10 @@ import vu.wdps.group09.model.FreeBaseEntity
 /**
   * Created by richard on 06/12/2016.
   */
-class WarcToText {
+object WarcToText {
   def main(args: Array[String]): Unit = {
     val inputPath = args(0)
-    val outputPath = args(0)
+    val outputPath = args(1)
 
     val logger = LogManager.getRootLogger
     logger.setLevel(Level.INFO)
@@ -37,7 +37,7 @@ class WarcToText {
     // Get all entities grouped by the URL where they were found
     input.map(_._2)
       // Only HTTP responses
-      .filter(wr => wr.header.contentTypeStr == "application/http; msgtype=response")
+      .filter(wr => wr.header.contentTypeStr.replaceAllLiterally(" ", "") == "application/http;msgtype=response")
       // Only HTML content
       .filter(wr => Option(wr.getHttpHeader.contentType).getOrElse("").contains("text/html"))
       .filter(_.hasPayload)
@@ -48,7 +48,7 @@ class WarcToText {
         case (url, payload) => {
           // Apparently it can still happen that we don't get actual XML/HTML as output, so catch exception
           try {
-            Option(url, payload.substring(payload.indexOf('<')))
+            Some(url, payload.substring(payload.indexOf('<')))
           } catch {
             case e: Exception => None
           }
