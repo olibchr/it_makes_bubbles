@@ -125,6 +125,9 @@ class EntityVectorExtractor {
     val indexLabelTuples: RDD[(Long, String)] = entityIndexTuples
       .map(t => (t._2, t._1))
       .mapValues(_.label)
+      .mapValues(_.replaceAllLiterally("/", " "))
+      .mapValues(_.replaceAllLiterally("\t", " "))
+      .mapValues(_.replaceAllLiterally(",", " "))
 
     // Maps freebase IDs to indexes (which function as new IDs)
     val indexByIdMap = sc.broadcast(idIndexTuples.collectAsMap())
@@ -140,17 +143,17 @@ class EntityVectorExtractor {
         .mapValues(_.length)
       )
       // Map (index, count) tuples to strings
-      .mapValues(_.map(t => s"${t._1}x${t._2}"))
+      .mapValues(_.map(t => s"${t._1}/${t._2}"))
       // Map (url, vector) tuples to strings
       .map(t => s"${t._1}\t${t._2.mkString(",")}")
       // Write to file
-      .saveAsTextFile(outputPath + "_documentEntityVectors")
+      .saveAsTextFile(outputPath + "_DocumentEntityVectors")
 
     // Write label map to file
     indexLabelTuples
       .sortByKey(true)
       .map(_._2)
-      .saveAsTextFile(outputPath + "_entityLabelMap")
+      .saveAsTextFile(outputPath + "_DEntityLabelMap")
   }
 
   /**
