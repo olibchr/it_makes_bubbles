@@ -2,17 +2,12 @@ package vu.wdps.group09
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri, MultiSearchResult}
-import de.l3s.boilerpipe.extractors.CommonExtractors
 import edu.stanford.nlp.ie.crf.CRFClassifier
-import nl.surfsara.warcutils.WarcInputFormat
-import org.apache.commons.io.IOUtils
-import org.apache.hadoop.io.LongWritable
 import org.apache.log4j.{Level, LogManager, Logger}
 import org.apache.lucene.queryparser.flexible.standard.QueryParserUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.elasticsearch.common.settings.Settings
-import org.jwat.warc.WarcRecord
 import vu.wdps.group09.model.FreeBaseEntity
 
 import scala.collection.JavaConversions._
@@ -60,8 +55,8 @@ object EntityVectorExtractor {
             (url, surfaceForms)
         }
       })
-      // Split entities in groups of 50 to avoid too large Elastic Search requests
-      .flatMapValues(xs => split[String](xs.toList, 50))
+      // Split entities in groups of 20 to avoid too large Elastic Search requests
+      .flatMapValues(xs => split[String](xs.toList, 20))
       // Do an ElasticSearch request for each entity
       .mapPartitions(iter => {
         val settings = Settings.builder().put("cluster.name", "web-data-processing-systems").build()
@@ -141,7 +136,7 @@ object EntityVectorExtractor {
     indexLabelTuples
       .sortByKey(true)
       .map(_._2)
-      .saveAsTextFile(outputPath + "_DEntityLabelMap")
+      .saveAsTextFile(outputPath + "_EntityLabelMap")
   }
 
   /**
