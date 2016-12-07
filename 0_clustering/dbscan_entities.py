@@ -9,11 +9,12 @@ from sklearn.preprocessing import normalize
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
 
 def get_enitity_mapping():
     id_to_entity = {}
-    with open('EntityLabelMap.tsv') as entity_map:
+    with open('EntityLabelMap2.tsv') as entity_map:
         reader = csv.reader(entity_map, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         cnt = 0
         for row in reader:
@@ -24,7 +25,7 @@ def get_enitity_mapping():
 
 def get_entities_vec():
     all_entities = []
-    with open('DocumentEntityVectors.tsv') as ents:
+    with open('DocumentEntityVectors2.tsv') as ents:
         entities = ents.readlines()
         for row in entities:
 
@@ -44,8 +45,6 @@ def get_entities_vec():
 def build_vectors(all_entities, lilx, lily):
     positions = []
     data = []
-    print lilx
-    print lily
     for entity in all_entities:
         this_position = []
         this_data = []
@@ -74,10 +73,12 @@ def main():
     sparse_entities = build_vectors(all_entities, len(all_entities), len(id_to_entity))
 
     print "Start clustering.."
+    transformer = TfidfTransformer(smooth_idf=False)
+    sparse_entities = transformer.fit_transform(sparse_entities)
 
     sparse_entities = StandardScaler(with_mean=False).fit_transform(sparse_entities)
 
-    db = DBSCAN(eps=7, min_samples=5, metric="precomputed").fit(sparse_entities)
+    db = DBSCAN(eps=0.6, min_samples=3, algorithm='brute', metric='cosine').fit(sparse_entities)
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
     labels = db.labels_
@@ -85,7 +86,6 @@ def main():
     print('Estimated number of clusters: %d' % n_clusters_)#
 
 
-    import matplotlib.pyplot as plt
 
     # Black removed and is used for noise instead.
     unique_labels = set(labels)
@@ -107,7 +107,19 @@ def main():
             except ValueError:
                 break
         target_entities.append(this_class)
-    print (target_entities)
+    print_list = []
+    for k in target_entities:
+        print_list.append(len(k))
+    all_url = [k[0] for k in all_entities]
+    i = 0
+    for target in target_entities:
+        #print len(target)
+        i += 1
+        #print i
+        #for idx in target:
+            #print all_url[idx]
+        #print '-------'
+    print print_list
 
 
 if __name__ == "__main__":

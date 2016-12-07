@@ -5,6 +5,7 @@ DS_STORE
 .idea/*
 .idea/
 *.class
+*.tsv
 EntityVectorExtractor/.idea
 EntityVectorExtractor/target
 EntityVectorExtractor/project/target
