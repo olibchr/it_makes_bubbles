@@ -44,7 +44,8 @@ object WarcToText {
       // Get payload
       .map(wr => (wr.header.getHeader("WARC-Target-URI").value, IOUtils.toString(wr.getPayload.getInputStreamComplete)))
       // Filter out duplicates
-      .distinct()
+      .groupByKey()
+      .mapValues(_.toList.head)
       // Get HTML
       .flatMap {
         case (url, payload) => {

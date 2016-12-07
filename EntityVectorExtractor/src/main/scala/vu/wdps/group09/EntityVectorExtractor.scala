@@ -20,7 +20,7 @@ object EntityVectorExtractor {
   def main(args: Array[String]) = {
     val inputPath = args(0)
     val outputPath = args(1)
-    var partitions = Integer.parseInt(args(2))
+    val partitions = Integer.parseInt(args(2))
 
     val logger = LogManager.getRootLogger
     logger.setLevel(Level.INFO)
