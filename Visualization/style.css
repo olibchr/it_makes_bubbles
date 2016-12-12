@@ -1,0 +1,44 @@
+h1 {
+    text-align: center;
+}
+#circles {
+    position: relative;
+    margin: 10px auto;
+    width: 1200px;
+    height: 640px;
+    /*border: 1px solid black;*/
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid #222;
+    box-sizing: border-box;
+    background-color: pink;
+    overflow: hidden;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.circle .entities {
+    pointer-events: none;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%)
+}
+
+.circle .entity {
+    text-align: center;
+    white-space: nowrap;
+}
+
+#websites-container {
+    max-height: 400px;
+    overflow: scroll;
+}
+
+.website {
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+}
