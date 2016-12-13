@@ -10,11 +10,12 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+import json
 
 
 def get_enitity_mapping():
     id_to_entity = {}
-    with open('EntityLabelMap2.tsv') as entity_map:
+    with open('EntityLabelMap.tsv') as entity_map:
         reader = csv.reader(entity_map, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         cnt = 0
         for row in reader:
@@ -24,8 +25,8 @@ def get_enitity_mapping():
 
 
 def get_entities_vec():
-    all_entities = []
-    with open('DocumentEntityVectors2.tsv') as ents:
+    all_entities = {}
+    with open('DocumentEntityVectors.tsv') as ents:
         entities = ents.readlines()
         for row in entities:
 
@@ -38,7 +39,8 @@ def get_entities_vec():
                 k = int(ent.split('/')[0].rstrip('\n'))
                 v = int(ent.split('/')[1].rstrip('\n'))
                 target_list.append([k, v])
-            all_entities.append([url, target_list])
+            all_entities[url] = target_list
+    all_entities = [[k,v] for k,v in all_entities.iteritems()]
     return all_entities
 
 
@@ -78,7 +80,15 @@ def main():
 
     sparse_entities = StandardScaler(with_mean=False).fit_transform(sparse_entities)
 
-    db = DBSCAN(eps=0.6, min_samples=3, algorithm='brute', metric='cosine').fit(sparse_entities)
+    #----------------------------------------------------------------------------------------
+
+
+
+
+    #----------------------------------------------------------------------------------------
+
+
+    db = DBSCAN(eps=0.15, min_samples=9, algorithm='brute', metric='cosine').fit(sparse_entities)
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
     labels = db.labels_
@@ -112,14 +122,25 @@ def main():
         print_list.append(len(k))
     all_url = [k[0] for k in all_entities]
     i = 0
+    js_dumps = ""
     for target in target_entities:
         #print len(target)
         i += 1
         #print i
-        #for idx in target:
-            #print all_url[idx]
-        #print '-------'
-    print print_list
+        this_urls = []
+        top_ents = []
+        for idx in target:
+            this_urls.append(all_url[idx])
+            if idx in top_ents:
+
+                top_ents[idx] = top_ents[idx] + all_entities[idx][1]
+            else:
+                top_ents[idx] = all_entities[i][1]
+            break
+        break
+        js_dumps = js_dumps + json.dumps({'websites': [this_urls], 'topterms': []})
+
+    #print print_list
 
 
 if __name__ == "__main__":
