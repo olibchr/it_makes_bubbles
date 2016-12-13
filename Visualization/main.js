@@ -1,8 +1,9 @@
-var sizeMap;
+function colores_google(n) {
+    var colores_g = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+    return colores_g[n % colores_g.length];
+}
+
 $(document).ready(function() {
-
-    const colors = ['#EF5350', '#EC407A', '#AB47BC', '#7E57C2', '#5C6BC0', '#42A5F5', '#29B6F6', '#26C6DA', '#26A69A'];
-
     // INIT
     let circleCounter = 0;
     let $circleContainer = $('#circles');
@@ -12,7 +13,7 @@ $(document).ready(function() {
     const maxSize = clusters.reduce((max, curr) => curr.websites.length > max ? curr.websites.length : max, Number.MIN_VALUE);
     const minOut = 1;
     const maxOut = 5;
-    sizeMap = size => (size - minSize) * (maxOut - minOut) / (maxSize - minSize) + minOut;
+    const sizeMap = size => (size - minSize) * (maxOut - minOut) / (maxSize - minSize) + minOut;
 
     // Pack circles
     let clusterRadiusTuples = clusters.map(c => {
@@ -33,7 +34,7 @@ $(document).ready(function() {
         let i = clusterRadiusTuples.findIndex(t => t.radius == circle.r);
         let cluster = clusterRadiusTuples[i].cluster;
         clusterRadiusTuples.splice(i, 1);
-        drawCircle(circle, cluster.topterms, cluster.websites);
+        drawCircle(circle, cluster.topterms.slice(0, 1), cluster.websites);
     }
 
     // FUNCTIONS
@@ -51,8 +52,8 @@ $(document).ready(function() {
         let $circle = $circleContainer.find(`#circle-${circleCounter}`);
 
         // Set color, radius and relocate
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        $circle.css('backgroundColor', color);
+        // $circle.css('backgroundColor', randomColor({luminosity: 'light'}));
+        $circle.css('backgroundColor', colores_google(circleCounter));
         setRadius($circle, circle.r * zoom);
         relocateByCenter($circle, (circle.c.x + dx) * zoom, (circle.c.y + dy) * zoom);
 

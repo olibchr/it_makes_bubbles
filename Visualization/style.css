@@ -12,7 +12,7 @@ h1 {
 .circle {
     position: absolute;
     border-radius: 50%;
-    border: 1px solid #222;
+    /*border: 1px solid #222;*/
     box-sizing: border-box;
     background-color: pink;
     overflow: hidden;
@@ -28,6 +28,7 @@ h1 {
 }
 
 .circle .entity {
+    color: white;
     text-align: center;
     white-space: nowrap;
 }

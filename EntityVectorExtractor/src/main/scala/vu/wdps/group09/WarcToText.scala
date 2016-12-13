@@ -43,6 +43,13 @@ object WarcToText {
       .filter(_.hasPayload)
       // Get payload
       .map(wr => (wr.header.getHeader("WARC-Target-URI").value, IOUtils.toString(wr.getPayload.getInputStreamComplete)))
+      // Filter out German and Dutch URLs
+      .filter(t => {
+        val slashTokens = t._1.split('/')
+        val tld = slashTokens(2).split('.').last.toLowerCase
+
+        tld != "nl" && tld != "de" && !slashTokens.contains("nl") && !slashTokens.contains("de")
+      })
       // Filter out duplicates
       .groupByKey()
       .mapValues(_.toList.head)
