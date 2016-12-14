@@ -34,7 +34,7 @@ $(document).ready(function() {
         let i = clusterRadiusTuples.findIndex(t => t.radius == circle.r);
         let cluster = clusterRadiusTuples[i].cluster;
         clusterRadiusTuples.splice(i, 1);
-        drawCircle(circle, cluster.topterms.slice(0, 1), cluster.websites);
+        drawCircle(circle, cluster.topterms.slice(0, 3), cluster.websites);
     }
 
     // FUNCTIONS
