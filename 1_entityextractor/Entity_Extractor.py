@@ -1,4 +1,4 @@
-mport nltk
+import nltk
 from nltk.tree import Tree
 import sys
 import html2text
@@ -111,6 +111,7 @@ def get_entity_ids(all_objects):
         s_url = 'http://10.149.0.127:9200/freebase/label/_search'
 
         ids = set()
+        surfaces = set()
         for e in entity_strings:
             try:
                 query = json.dumps({
@@ -123,17 +124,22 @@ def get_entity_ids(all_objects):
                 response = requests.post(s_url, data=query).json()
                 hits = response.get('hits', {}).get('hits', [])
                 best_id = None
+
                 if hits:
                     fid_counts = collections.Counter(hit['_source']['resource'] for hit in hits)
                     best_id, count = fid_counts.most_common(1)[0]
                     best_id = best_id.replace('fbase:m.', '/m/')
                 ids.add(str(best_id))
+
+                reverse_query = json.dumps({"query": {"match": {"resource": best_id}}})
+                surface_form = requests.post(s_url, data=reverse_query).json()
+                surfaces.add(str(surface_form))
             except requests.exceptions.ConnectionError as e:
                 ids.add(str(e))
 
         if ids:
             # webpage.url = url
-            webpage.entities = ids
+            webpage.entities = surfaces
             return_objects.append(webpage)
     return return_objects
 
