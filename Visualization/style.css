@@ -1,23 +1,27 @@
+html, body {
+    background-color: #222;
+}
+
 h1 {
     text-align: center;
+    color: white;
 }
 #circles {
     position: relative;
     margin: 10px auto;
     width: 1200px;
     height: 640px;
-    /*border: 1px solid black;*/
 }
 
 .circle {
     position: absolute;
     border-radius: 50%;
-    /*border: 1px solid #222;*/
     box-sizing: border-box;
     background-color: pink;
     overflow: hidden;
     cursor: pointer;
     font-size: 12px;
+    box-shadow: 1px 1px 10px;
 }
 
 .circle .entities {
