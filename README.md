@@ -1,4 +1,4 @@
-# past_life_classifier - It makes bubbles
+# It Makes Bubbles (IMB)
 
 Under development
 
