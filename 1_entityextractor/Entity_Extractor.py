@@ -8,7 +8,9 @@ import collections
 all_ent = {}
 iterator = 0
 all_objects = []
-with open("historyText2.tsv") as history_file:
+path = sys.argv[1]
+
+with open(path + "historyTextBig.tsv") as history_file:
     for line in history_file:
         record = line.split("\t")
         record[1] = record[1].decode('utf-8')
@@ -41,8 +43,9 @@ def extract_pages(all_objects):
     return_objects = []
     for object in all_objects:
         key, content = object
-        p_ents = (''.join(key.split('.'))).split(':')
+        # p_ents = (''.join(key.split('.'))).split(':')
         """
+        # Filtering webpages
         url_ent = ''
         for p_ent in p_ents:
             if ('www' in p_ent) or ('http' in p_ent) or ('/' in p_ent) or (len(p_ent) < 4):
@@ -60,7 +63,6 @@ def extract_pages(all_objects):
         webpage = Webpage()
         webpage.url = key
         webpage.content = content
-
         if webpage.url and webpage.content:
             return_objects.append(webpage)
     return return_objects
@@ -77,7 +79,7 @@ def parse_entities(all_objects):
         webpage = object
         tokens = nltk.word_tokenize(webpage.content)
         tagged = nltk.pos_tag(tokens)
-        chunked = nltk.chunk.ne_chunk(tagged)
+        chunked = nltk.chunk.ne_chunk(tagged, binary=True)
         prev = None
         continuous_chunk = []
         current_chunk = []
@@ -212,6 +214,9 @@ def main(all_objects):
     print "Parsing entities.."
     all_objects = parse_entities(all_objects)
     print 'Getting ids of: ' + str(len(all_objects)) + ' objects.'
+
+    return
+
     all_objects = get_entity_ids(all_objects)
     all_objects = build_cnt_set(all_objects)
     print 'Building dictionary..'
